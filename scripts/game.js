@@ -6,9 +6,6 @@ function game() {
     $("<div/>").attr("id", "paddleB").appendTo("#game");
     $("<div/>").attr("id", "ball").appendTo("#game");
 
-    
-   
-    
     var ball = {
         speed: 3,
         x: 290,
@@ -23,6 +20,10 @@ function game() {
         x2: $("#paddleA").position().left + $("#paddleA").width(),
         y1: $("#paddleA").position().top,
         y2: $("#paddleA").position().top + $("#paddleA").height(),
+        update: function () {
+            this.y1 = $("#paddleA").position().top;
+            this.y2 = this.y1 + $("#paddleA").height();
+        }
     };
 
     var pB = {
@@ -31,17 +32,52 @@ function game() {
         x2: $("#paddleB").position().left + $("#paddleB").width(),
         y1: $("#paddleB").position().top,
         y2: $("#paddleB").position().top + $("#paddleB").height(),
+        update: function () {
+            this.y1 = $("#paddleB").position().top;
+            this.y2 = this.y1 + $("#paddleB").height();
+        }
     };
 
+    var PaddleA = $("#paddleA");
+    var PaddleB = $("#paddleB");
+    var directions = {};
+    var speed = 4;
 
-    $(document).ready(function () {
-        // Set main loop to be called on the desired frame rate
-        setInterval(gameLoop, 1000 / 60);
-    });
+    //Paddle move actions
+    $('html').keyup(stop).keydown(charMovement);
 
-    // Main loop of the game
-    function gameLoop() {
-        moveBall();
+    function charMovement(e) {
+        directions[e.which] = true;
+    }
+
+    function stop(e) {
+        delete directions[e.which];
+    }
+
+    function movepaddleA(e) {
+        for (var i in directions) {
+
+            if (PaddleA.position().top > 0 && i == 87) {
+                PaddleA.css("top", (PaddleA.position().top - speed) + "px");
+            }
+            if (PaddleA.position().top < ($("#game").height() - PaddleA.height()) && i == 83) {
+                PaddleA.css("top", (PaddleA.position().top + speed) + "px");
+            }
+            pA.update();
+        }
+    }
+
+    function movepaddleB(e) {
+        for (var i in directions) {
+
+            if (PaddleB.position().top > 0 && i == 38) {
+                PaddleB.css("top", (PaddleB.position().top - speed) + "px");
+            }
+            if (PaddleB.position().top < ($("#game").height() - PaddleB.height()) && i == 40) {
+                PaddleB.css("top", (PaddleB.position().top + speed) + "px");
+            }
+            pB.update();
+        }
     }
 
 
@@ -62,13 +98,11 @@ function game() {
 
         // Check collision to the left border and change the moving orientation on X axis
         if (ball.x + ball.speed * ball.directionX > (gameWidth - parseInt($("#ball").width()))) {
-            alert("PaddleB lost")
             ball.directionX = -1
         }
 
         // Check collision to the right border and change the moving orientation on X axis
         if (ball.x + ball.speed * ball.directionX < 0) {
-            alert("PaddleA lost")
             ball.directionX = 1
         }
 
@@ -86,53 +120,23 @@ function game() {
             }
         }
 
-
-        $("html").keydown(function(e){p1.text(e.which)}).keyup(function(e){p2.text(e.which)});
-
         // Update ball position on X and Y axes based on speed and orientation
         ball.x += ball.speed * ball.directionX;
         ball.y += ball.speed * ball.directionY;
 
-
-
-
-        function movePaddles() {
-	var paddleSpeed = 5;
-
-	// Check keyboard events
-	if (pressedKeys[KEY.W]) {
-		// Move the paddle A up
-		var top = parseInt($("#paddleA").css("top"));
-		if (top >= -parseInt($("#paddleA").css("height"))/2) {
-			$("#paddleA").css("top", top - paddleSpeed);
-		}
-	}
-	if (pressedKeys[KEY.S]) {
-		// Move the paddle B down
-		var top = parseInt($("#paddleA").css("top"));
-		if (top <= (parseInt($("#game").css("height")) - (parseInt($("#paddleA").css("height")))/2)) {
-			$("#paddleA").css("top", top + paddleSpeed);
-		}
-	}
-	if (pressedKeys[KEY.UP]) {
-		// Move the paddle B up
-		var top = parseInt($("#paddleB").css("top"));
-		if (top >= -parseInt($("#paddleB").css("height"))/2) {
-			$("#paddleB").css("top", top - paddleSpeed);
-		}
-	}
-	if (pressedKeys[KEY.DOWN]) {
-		// Move the paddle B down
-		var top = parseInt($("#paddleB").css("top"));
-		if (top <= (parseInt($("#game").css("height")) - (parseInt($("#paddleB").css("height")))/2)) {
-			$("#paddleB").css("top", top + paddleSpeed);
-		}
-	}
-}
-
-
         // Render the updated ball position
         $("#ball").css({ "left": ball.x, "top": ball.y });
+    }
+
+
+    setInterval(gameLoop, 1000 / 60);
+
+
+    // Main loop of the game
+    function gameLoop() {
+        moveBall();
+        movepaddleA();
+        movepaddleB();
     }
 
 }
