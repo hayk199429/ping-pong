@@ -14,6 +14,7 @@ function game() {
         directionY: 1
     };
 
+
     var pA = {
         speed: 3,
         x1: $("#paddleA").position().left,
