@@ -2,6 +2,10 @@ function game() {
     $("body").empty();
     $("<div/>").attr("id", "content").appendTo("body");
     $("<div/>").attr("id", "game").appendTo("#content");
+    $("<div/>").attr("id", "scorepaddleA").appendTo("#game");
+    $("#scorepaddleA").text("0");
+    $("<div/>").attr("id", "scorepaddleB").appendTo("#game");
+    $("#scorepaddleB").text("0");
     $("<div/>").attr("id", "paddleA").appendTo("#game");
     $("<div/>").attr("id", "paddleB").appendTo("#game");
     $("<div/>").attr("id", "ball").appendTo("#game");
@@ -14,6 +18,10 @@ function game() {
         directionY: 1
     };
 
+    var score = {
+        paddleA: 0,
+        paddleB: 0
+    };
 
     var pA = {
         speed: 3,
@@ -81,11 +89,14 @@ function game() {
         }
     }
 
+    var pauseBall = false;
 
     // Control movement of the ball doing collision checking
     function moveBall() {
         var gameWidth = parseInt($("#game").width());
         var gameHeight = parseInt($("#game").height());
+ 
+        if (pauseBall) return;
 
         // Check collision to the bottom border and change the moving orientation on Y axis
         if (ball.y + ball.speed * ball.directionY > (gameHeight - parseInt($("#ball").height()))) {
@@ -100,11 +111,27 @@ function game() {
         // Check collision to the left border and change the moving orientation on X axis
         if (ball.x + ball.speed * ball.directionX > (gameWidth - parseInt($("#ball").width()))) {
             ball.directionX = -1
+            score.paddleB = score.paddleB + 1;
+            $("#scorepaddleB").empty().append([score.paddleB]);
+            console.log(score.paddleB);
+            ball.x = 290;
+            ball.y = 140;
+            pauseBall = true;
+            $("#ball").animate({ "left": ball.x, "top": ball.y }, 2000, function () { pauseBall = false; });
+            return;
         }
 
         // Check collision to the right border and change the moving orientation on X axis
         if (ball.x + ball.speed * ball.directionX < 0) {
             ball.directionX = 1
+            score.paddleA = score.paddleA + 1;
+            $("#scorepaddleA").empty().append([score.paddleA]);
+            console.log(score.paddleA);
+            ball.x = 290;
+            ball.y = 140;
+            pauseBall = true;
+            $("#ball").animate({ "left": ball.x, "top": ball.y }, 2000, function () { pauseBall = false; });
+            return;
         }
 
         // Check collision with PaddleA

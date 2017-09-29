@@ -1,5 +1,0 @@
-Name: 
-Surname: 
-Email:
-Date:
-
